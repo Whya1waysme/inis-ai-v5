@@ -10,11 +10,9 @@ from ..config import settings
 class HiggsfieldClient:
     def __init__(self, api_key: Optional[str] = None, base_url: Optional[str] = None) -> None:
         self.api_key = api_key or settings.higgsfield_api_key
-        if not self.api_key:
-            raise RuntimeError("Higgsfield API key is not configured")
         self.base_url = base_url or settings.higgsfield_api_url or "https://api.higgsfield.ai/v1"
         self._headers = {
-            "Authorization": f"Bearer {self.api_key}",
+            "Authorization": f"Bearer {self.api_key}" if self.api_key else "",
             "Content-Type": "application/json",
         }
 
@@ -37,6 +35,8 @@ class HiggsfieldClient:
         if additional_params:
             payload.update(additional_params)
 
+        if not self.api_key:
+            raise RuntimeError("Higgsfield API key is not configured")
         async with httpx.AsyncClient(timeout=60.0) as client:
             resp = await client.post(
                 f"{self.base_url}/images/generate",

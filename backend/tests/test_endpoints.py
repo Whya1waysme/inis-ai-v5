@@ -34,7 +34,7 @@ def test_generate_script_success(client, monkeypatch):
     )
     assert r.status_code == 200, r.text
     data = r.json()
-    assert "script_id" in data and data["script_id"] > 0
+    assert "content" in data
     assert "A simple test script" in data["content"]
 
 
@@ -48,7 +48,6 @@ def test_generate_storyboard_success(client, monkeypatch):
     )
     r = client.post("/generate-script", json={"prompt": "Create storyboard."})
     assert r.status_code == 200
-    script_id = r.json()["script_id"]
 
     async def fake_generate_images(self, prompt: str, num_images: int = 1, **kwargs: Any) -> List[str]:
         return [
@@ -61,7 +60,7 @@ def test_generate_storyboard_success(client, monkeypatch):
     r2 = client.post(
         "/generate-storyboard",
         json={
-            "script_id": script_id,
+            "prompt": "A scene with two images",
             "num_images": 2,
             "width": 512,
             "height": 288,
@@ -74,6 +73,6 @@ def test_generate_storyboard_success(client, monkeypatch):
     assert len(data["storyboards"]) == 2
 
     # Verify listing
-    r3 = client.get("/storyboards", params={"script_id": script_id})
+    r3 = client.get("/storyboards", params={"script_id": 123})
     assert r3.status_code == 200
-    assert len(r3.json()["items"]) >= 2
+    assert r3.json()["items"] == []

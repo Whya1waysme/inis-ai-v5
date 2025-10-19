@@ -8,7 +8,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from .config import settings
-from .db import init_db
 from .routers import scripts as scripts_router
 from .routers import storyboards as storyboards_router
 from .routers import camera as camera_router
@@ -38,7 +37,6 @@ def create_app() -> FastAPI:
     @app.on_event("startup")
     def on_startup():
         logging.basicConfig(level=getattr(logging, settings.log_level.upper(), logging.INFO))
-        init_db()
         logger.info("Application started. Environment=%s", settings.environment)
 
     @app.exception_handler(Exception)
