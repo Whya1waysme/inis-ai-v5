@@ -13,13 +13,9 @@ from app.config import settings
 
 
 @pytest.fixture(scope="session", autouse=True)
-def setup_env(tmp_path_factory):
-    # Use a temp sqlite db for tests
-    tmp_dir = tmp_path_factory.mktemp("db")
-    db_path = tmp_dir / "test.db"
-    os.environ["DATABASE_URL"] = f"sqlite:///{db_path}"
-    # Force reload settings if necessary
-    settings.database_url = os.environ["DATABASE_URL"]
+def setup_env():
+    # No-op in stateless mode
+    pass
 
 
 def test_healthz():
@@ -46,12 +42,6 @@ def test_camera_settings():
 
 @pytest.mark.asyncio
 async def test_storyboards_list_empty():
-    # No script yet; first create a dummy script in DB via direct endpoint call
-    client = TestClient(app)
-    # Mock OpenAI by skipping the actual call using env without key -> expect error if called
-    # Instead, we can insert script by POST with minimal body but we need OpenAI
-    # We'll bypass: call camera-settings (no dependency) and then query storyboards which should be []
-
     async with AsyncClient(app=app, base_url="http://test") as ac:
         r = await ac.get("/storyboards", params={"script_id": 99999})
         assert r.status_code == 200

@@ -10,10 +10,9 @@ from ..config import settings
 class OpenAIClient:
     def __init__(self, api_key: Optional[str] = None, model: Optional[str] = None) -> None:
         self.api_key = api_key or settings.openai_api_key
-        if not self.api_key:
-            raise RuntimeError("OpenAI API key is not configured")
         self.model = model or settings.openai_model
-        self._client = OpenAI(api_key=self.api_key)
+        # Defer client initialization to avoid hard dependency in tests
+        self._client = OpenAI(api_key=self.api_key) if self.api_key else None
 
     def generate_script(
         self,
@@ -33,6 +32,8 @@ class OpenAIClient:
         if extra_instructions:
             system_prompt += f" Additional guidance: {extra_instructions}"
 
+        if not self._client:
+            raise RuntimeError("OpenAI API key is not configured")
         completion = self._client.chat.completions.create(
             model=self.model,
             temperature=temperature,

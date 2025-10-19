@@ -15,13 +15,11 @@ class GenerateScriptRequest(BaseModel):
 
 
 class GenerateScriptResponse(BaseModel):
-    script_id: int
     content: str
 
 
 class GenerateStoryboardRequest(BaseModel):
-    script_id: int
-    prompt: Optional[str] = None
+    prompt: str
     num_images: int = 1
     width: int = 1024
     height: int = 576
@@ -30,7 +28,6 @@ class GenerateStoryboardRequest(BaseModel):
 
 
 class StoryboardItem(BaseModel):
-    id: int
     image_url: str
     prompt: str
 
@@ -40,7 +37,6 @@ class GenerateStoryboardResponse(BaseModel):
 
 
 class CameraSettingsRequest(BaseModel):
-    script_id: Optional[int] = None
     scene_type: Optional[str] = Field(None, description="e.g., portrait, landscape, sports, night")
     lighting: Optional[str] = Field(None, description="e.g., daylight, cloudy, tungsten, fluorescent, low-light")
     motion: Optional[str] = Field(None, description="none, slow, fast")
@@ -54,7 +50,6 @@ class CameraSettingsResponse(BaseModel):
     aperture: float
     white_balance: str
     notes: Optional[str] = None
-    script_id: Optional[int] = None
 
 
 class StoryboardsListResponse(BaseModel):

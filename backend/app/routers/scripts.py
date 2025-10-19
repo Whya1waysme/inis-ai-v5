@@ -1,18 +1,15 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException
-from sqlmodel import select
+from fastapi import APIRouter, HTTPException
 
 from ..clients.openai_client import OpenAIClient
-from ..db import get_session
-from ..models import Script
 from ..schemas import GenerateScriptRequest, GenerateScriptResponse
 
 router = APIRouter(prefix="/generate-script", tags=["scripts"])
 
 
 @router.post("", response_model=GenerateScriptResponse)
-def generate_script(payload: GenerateScriptRequest, session=Depends(get_session)):
+def generate_script(payload: GenerateScriptRequest):
     if not payload.prompt:
         raise HTTPException(status_code=400, detail="prompt is required")
 
@@ -25,13 +22,4 @@ def generate_script(payload: GenerateScriptRequest, session=Depends(get_session)
         extra_instructions=payload.extra_instructions,
     )
 
-    script = Script(
-        title=payload.title or payload.prompt[:80],
-        prompt=payload.prompt,
-        content=content,
-    )
-    session.add(script)
-    session.commit()
-    session.refresh(script)
-
-    return GenerateScriptResponse(script_id=script.id, content=script.content)
+    return GenerateScriptResponse(content=content)
