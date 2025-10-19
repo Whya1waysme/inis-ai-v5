@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import os
 from typing import List
 
 from fastapi import FastAPI, Request
@@ -17,7 +18,9 @@ logger = logging.getLogger("uvicorn.error")
 
 
 def create_app() -> FastAPI:
-    app = FastAPI(title="Script & Storyboard API", version="0.1.0")
+    # When deployed behind a path prefix (e.g., Vercel /api), honor root_path
+    root_path = os.getenv("FASTAPI_ROOT_PATH", "")
+    app = FastAPI(title="Script & Storyboard API", version="0.1.0", root_path=root_path)
 
     # CORS
     origins: List[str] = settings.cors_origins or ["*"]

@@ -1,18 +1,24 @@
 {
   "version": 2,
+  "trailingSlash": false,
+  "env": {
+    "FASTAPI_ROOT_PATH": "/api"
+  },
   "builds": [
     {
-      "src": "frontend/package.json",
+      "src": "frontend/inis-frontend/package.json",
       "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
+      "config": { "distDir": "dist" }
+    },
+    {
+      "src": "backend/api/index.py",
+      "use": "@vercel/python"
     }
   ],
   "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/frontend/$1"
-    }
+    { "src": "^/api$", "dest": "/backend/api/index.py" },
+    { "src": "^/api/(.*)$", "dest": "/backend/api/index.py" },
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
